@@ -1,0 +1,80 @@
+USE AdventureWorks2019; 
+
+-- Generamos la funcion matematica. (Deterministic y NoSQL)
+GO
+CREATE FUNCTION dbo.fn_matematica(@V1 INT, @V2 INT)
+RETURNS INT
+AS -- Delimitador del encabezado y el cuerpo de la funcion. 
+	BEGIN
+		DECLARE @Resultado INT;
+		SET @Resultado = @V1 + @V2
+		RETURN @Resultado
+	END;
+GO
+
+-- Invocamos la funcion
+SELECT dbo.fn_matematica(4,12) AS ResultadoMatematica
+
+-- Creamos una funcion que devuelva la facturacion final del mercado solicitado.
+
+GO
+ALTER FUNCTION dbo.fn_FacturacionMercado(@v_territory VARCHAR(255))
+RETURNS DECIMAL(18,2)
+AS 
+	BEGIN
+		DECLARE @Resultado DECIMAL(18,2);
+		SET @Resultado = (	SELECT SUM(TotalDue) FROM Sales.SalesOrderHeader AS T1
+							LEFT JOIN Sales.SalesTerritory AS T2		
+								ON T1.TerritoryID = T2.TerritoryID
+							WHERE T2.Name LIKE CONCAT('%',@v_territory,'%'))
+		RETURN @Resultado
+	END;
+GO
+
+-- Invocamos la funcion. 
+SELECT FORMAT(dbo.fn_FacturacionMercado('FR'),'C','es-MX') AS Facturacion
+
+-- FUNCION QUE DEVUELVE UNA TABLA.
+
+SELECT * FROM HumanResources.Employee; 
+
+GO
+ALTER FUNCTION dbo.fn_NominaVendedores(@v_territorio VARCHAR(255))
+RETURNS TABLE
+AS -- Delimita el encabezado del cuerpo de la funcion
+	RETURN
+	(SELECT	T1.SalesPersonID, 
+			T2.BirthDate, 
+			T2.HireDate, 
+			COUNT(T1.SalesOrderID) AS CantidadOrdenes, 
+			SUM(T1.TotalDue) AS Ingresos
+	FROM Sales.SalesOrderHeader AS T1
+	LEFT JOIN HumanResources.Employee AS T2
+		ON T1.SalesPersonID = T2.BusinessEntityID
+	LEFT JOIN Sales.SalesTerritory AS T3
+		ON T1.TerritoryID = T3.TerritoryID
+	WHERE T3.CountryRegionCode LIKE CONCAT('%',@v_territorio,'%') AND SalesPersonID IS NOT NULL
+	GROUP BY T1.SalesPersonID, T2.BirthDate, T2.HireDate)
+GO
+
+
+SELECT * FROM dbo.fn_NominaVendedores('CA')
+
+-------------------------------------- DONDE PODEMOS APLICAR LAS FUNCIONES? -----------------------
+
+USE Macrotienda_bk; 
+
+GO
+CREATE FUNCTION dbo.fn_PromedioStock()
+RETURNS INT
+AS 
+	BEGIN
+		DECLARE @Resultado INT;
+		SET @Resultado = (SELECT AVG(Stock) AS Stock_Promedio FROM Prod.Productos)
+		RETURN @Resultado;
+	END;
+GO
+
+SELECT * FROM Prod.Productos WHERE Stock >= (SELECT dbo.fn_PromedioStock())
+
+SELECT * FROM Prod.Vendedores;

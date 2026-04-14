@@ -1,0 +1,12 @@
+-- Subconsulta Correlacionado 
+SELECT	T1.CustomerID,
+		CONCAT(T2.FirstName,' ',T2.LastName) AS Nombre,
+		(SELECT COUNT(SalesOrderID) FROM Sales.SalesOrderHeader AS T3 WHERE T1.CustomerID = T3.CustomerID) AS Cantidad_Ordenes
+FROM Sales.Customer AS T1
+LEFT JOIN Person.Person AS T2
+	ON T1.CustomerID = T2.BusinessEntityID
+
+-- Recaudacion Total de Canada
+SELECT TerritoryID, TotalDue 
+FROM Sales.SalesOrderHeader
+WHERE TerritoryID = (SELECT TerritoryID FROM Sales.SalesTerritory WHERE [Name] = 'Canada');

@@ -1,0 +1,2 @@
+-- Reseeds the 'Products' table, next insert will use ID 1
+DBCC CHECKIDENT ('Products', RESEED, 0);

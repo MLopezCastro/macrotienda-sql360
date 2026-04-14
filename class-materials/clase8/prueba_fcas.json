@@ -1,0 +1,5 @@
+{"ID_Factura": 102, "Fecha": "2026-03-10", "ID_Cliente": 12, "Productos": [{"ID_Producto": 5, "Cantidad": 1}, {"ID_Producto": 8, "Cantidad": 3}]}
+{"ID_Factura": 103, "Fecha": "2026-03-11", "ID_Cliente": 45, "Productos": [{"ID_Producto": 2, "Cantidad": 10}]}
+{"ID_Factura": 104, "Fecha": "2026-03-11", "ID_Cliente": 33, "Productos": [{"ID_Producto": 1, "Cantidad": 1}, {"ID_Producto": 4, "Cantidad": 2}, {"ID_Producto": 7, "Cantidad": 1}]}
+{"ID_Factura": 105, "Fecha": "2026-03-12", "ID_Cliente": 89, "Productos": [{"ID_Producto": 9, "Cantidad": 5}]}
+{"ID_Factura": 106, "Fecha": "2026-03-12", "ID_Cliente": 21, "Productos": [{"ID_Producto": 3, "Cantidad": 2}, {"ID_Producto": 6, "Cantidad": 2}]}

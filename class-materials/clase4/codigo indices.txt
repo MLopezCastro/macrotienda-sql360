@@ -1,0 +1,80 @@
+USE AdventureWorksDW2019; 
+
+------------------------------ CREACION DE INDICES ------------------------------------
+
+-- SQL SERVER: SET STATISTICS TIME ON
+-- PostgreSQL: EXPLAIN ANALYZE
+
+SET STATISTICS TIME OFF
+SELECT * FROM DimCustomer WHERE FirstName = 'Jon' and LastName = 'Yang'
+
+CREATE INDEX idx_customer_firstname
+	ON DimCustomer(FirstName,LastName);
+
+SELECT ProductKey, SalesOrderNumber, SalesAmount FROM FactInternetSales WHERE OrderDate = '2010-12-29' 
+
+CREATE INDEX idx_OrderDate
+	ON FactInternetSales(OrderDate)
+	INCLUDE(ProductKey, SalesOrderNumber, SalesAmount); 
+
+---------------------------- VARIABLES Y ESTRUCTURAS DE CONTROL --------------------------------------
+
+-- DECLARACION DE VARIABLES
+DECLARE @V1 INT;
+DECLARE @V2 INT;
+DECLARE @Resultado VARCHAR(255);
+
+-- Inicializamos la variable
+SET @V1 = 12;
+SET @V2 = 12;
+
+-- BIFURCAR EL CODIGO
+IF @V1 < @V2 -- Posibilidad 1
+	SET @Resultado = 'V1 es menor que V2'
+ELSE IF @V1 > @V2 -- Posibilidad 2
+	SET @Resultado = 'V1 es mayor que V2'
+ELSE -- Posibilidad 3
+	SET @Resultado = 'Ambas variables son iguales'
+
+SELECT @Resultado
+
+--------------------------------- TABLA DE TIEMPO ---------------------------------------
+
+USE Macrotienda_bk; 
+
+
+
+CREATE TABLE prod.DimTiempo(
+[Fecha] DATE PRIMARY KEY,
+[NroMes] INT NOT NULL,
+[Mes] VARCHAR(255) NOT NULL,
+[Dia] VARCHAR(255) NOT NULL); 
+-- AGREGAMOS UN CAMPO LLAMADO AÑO
+ALTER TABLE prod.DimTiempo
+ADD [Año] INT; 
+
+SELECT * FROM Prod.DimTiempo; 
+
+SELECT	MIN([Fecha de Venta]), -- 2016-01-02
+		MAX([Fecha de Venta]) -- 2016-03-10
+FROM Prod.Invoice; 
+
+-- Declaramos las variables
+DECLARE @FechaMin DATE;
+DECLARE @FechaMax DATE;
+
+-- Asignamos un valor 
+SET @FechaMin = (SELECT MIN([Fecha de Venta]) FROM Prod.Invoice);
+SET @FechaMax = (SELECT MAX([Fecha de Venta]) FROM Prod.Invoice);
+
+SELECT @FechaMin, MONTH(@FechaMin), DATENAME(MONTH,@FechaMin), DATENAME(DW,@FechaMin), YEAR(@FechaMin)
+
+-- BUCLE WHILE (LOOP CONDICIONAL)
+
+WHILE @FechaMin <= @FechaMax -- Mientras que esta condicion se cumple
+	BEGIN
+		PRINT @FechaMin
+		INSERT INTO Prod.DimTiempo(Fecha,NroMes,Mes,Dia,Año)
+			SELECT @FechaMin, MONTH(@FechaMin), DATENAME(MONTH,@FechaMin), DATENAME(DW,@FechaMin), YEAR(@FechaMin)
+		SET @FechaMin = DATEADD(DAY,1,@FechaMin) -- Se le agrega un dia nuevo.
+	END;
